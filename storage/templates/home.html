@@ -1,0 +1,8 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    {% if not user.is_authenticated %}
+        <h1>File storage</h1>
+        <a href="{% url 'account_login' %}">Sign In</a> or <a href="{% url 'account_signup' %}">Sign Up</a>
+    {% endif %}
+{% endblock %}

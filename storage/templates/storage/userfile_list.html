@@ -1,0 +1,61 @@
+{% extends "base_generic.html" %}
+
+
+{% block content %}
+    {% load static %}
+    <div class="add-file">
+        {% if form %}
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table>
+                    {{ form.as_p }}
+                </table>
+                <input type="submit" value="Submit">
+            </form>
+        {% endif %}
+    </div>
+    <div class="exit">
+        <a href="{% url 'account_logout' %}">Sign Out</a>
+    </div>
+
+    {% if user.is_authenticated %}
+
+            <table class="files">
+                <tr>
+                    <th>Upload time</th>
+                    <th>Filename</th>
+                    <th>Size</th>
+                    <th>Status</th>
+                </tr>
+                {% for userfile in userfiles%}
+                    <tr>
+                        <td>{{ userfile.upload_datetime|date:'Y-m-d H:i:s' }}</td>
+                        <td>{{ userfile.file.name }}</td>
+                        <td>{% if userfile.file.size >= 1024 %}{{ userfile.file.size|add:"//1024" }} KBytes{% else %} {{ userfile.file.size }} Bytes{% endif %}</td>
+                        <td>{% if userfile.status == 'p' %}Pending{% elif userfile.status == 'r' %}Ready{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+    {% endif %}
+    {% load static %}
+    <script>
+
+        function refreshPage(){
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: '{% url "file_list" %}',
+                dataType: "html",
+                success: function(){
+
+                    $('.files').load('{% url "file_list" %} tr');
+                    setTimeout(refreshPage, 2000);
+
+                }
+            });
+        }
+
+        refreshPage();
+    </script>
+{% endblock %}
